@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For The Most Gorgeous Girl | Shrushti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;400;600&display=swap');
+
+        :root {
+            --accent: #ff4d6d;
+            --soft-pink: #fff0f3;
+            --deep-maroon: #590d22;
+            --cream: #fffdfa;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--deep-maroon);
+            margin: 0;
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .serif { font-family: 'Playfair Display', serif; }
+        .cursive { font-family: 'Dancing Script', cursive; }
+
+        /* --- LANDING SCREEN --- */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: radial-gradient(circle at center, #ffffff 0%, #ffeef2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .intro-card {
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal-btn {
+            background: var(--accent);
+            color: white;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 15px 30px rgba(255, 77, 109, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .reveal-btn:active { transform: scale(0.95); }
+
+        /* --- BOOK STRUCTURE --- */
+        .viewport {
+            display: none;
+            height: 100%;
+            width: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            position: relative;
+        }
+
+        .page {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(1.05) translateX(30px);
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.7s ease;
+            background-color: var(--cream);
+        }
+
+        .page.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateX(0);
+            z-index: 10;
+        }
+
+        .page.prev {
+            transform: scale(0.95) translateX(-50px);
+            opacity: 0;
+        }
+
+        /* --- VISUAL AREA --- */
+        .visual-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2vh 5vw;
+            position: relative;
+        }
+
+        .visual-area img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 35px rgba(0,0,0,0.1)) 
+                    drop-shadow(0 0 10px rgba(255, 77, 109, 0.05));
+            border-radius: 6px;
+        }
+
+        /* --- JOURNAL STRIP --- */
+        .journal-strip {
+            flex: 0 0 auto;
+            min-height: 25vh;
+            background: #fff;
+            padding: 2rem 1.5rem 4rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.02);
+        }
+
+        .journal-strip::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .music-player {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+
+        .pagination {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .pg-dot {
+            width: 6px;
+            height: 6px;
+            background: #d1d5db;
+            border-radius: 50%;
+            transition: all 0.4s ease;
+        }
+
+        .pg-dot.active {
+            background: var(--accent);
+            width: 20px;
+            border-radius: 10px;
+        }
+
+        .heart-bit {
+            position: absolute;
+            pointer-events: none;
+            color: var(--accent);
+            opacity: 0.2;
+            animation: floatUp 12s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        @media (min-width: 1024px) {
+            .page { flex-direction: row; }
+            .visual-area { flex: 1.5; height: 100%; }
+            .journal-strip { flex: 1; height: 100%; min-height: 100%; padding-bottom: 2rem; border-top: none; border-left: 1px solid rgba(0,0,0,0.05); }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="./Audio/stream.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="heart-box"></div>
+
+    <!-- 1. LANDING SCREEN -->
+    <div id="intro-screen">
+        <div class="intro-card">
+            <div class="text-pink-500 text-6xl mb-6">❤️</div>
+            <h1 class="serif text-4xl md:text-6xl font-bold mb-4 tracking-tight">Happy Birthday, <br>Shrushti</h1>
+            <p class="cursive text-2xl text-pink-400 mb-10">To the most gorgeous girl in the whole world...</p>
+            <button onclick="unlockStory()" class="reveal-btn">Unlock Surprise ✨</button>
+        </div>
+    </div>
+
+    <!-- 2. MAIN EBOOK -->
+    <div class="viewport" id="bookView">
+        <div class="music-player" onclick="toggleAudio()" id="musicTrigger">
+            <svg id="musicIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        </div>
+
+        <!-- PAGE 1 -->
+        <section class="page active">
+            <div class="visual-area">
+                <img src="./Photos/1.jpg" alt="1">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Prologue</h2>
+                <p class="cursive text-3xl text-pink-600">The start of something beautiful...</p>
+                <p class="mt-8 text-[10px] tracking-[0.3em] uppercase text-gray-300">Swipe Left to Begin</p>
+            </div>
+        </section>
+
+        <!-- PAGE 2 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/2.jpg" alt="2">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Chapter One</h2>
+                <p class="serif italic text-xl px-6 text-gray-600 leading-relaxed">
+                    "Every moment spent by your side is a treasure that words simply cannot define."
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 3 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/3.jpg" alt="3">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Chapter Two</h2>
+                <p class="cursive text-4xl text-pink-600">Radiant Elegance</p>
+                <p class="serif text-sm mt-4 px-8 text-gray-500">Your smile has a way of turning the ordinary into the extraordinary.</p>
+            </div>
+        </section>
+
+        <!-- PAGE 4 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/4.jpg" alt="4">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Chapter Three</h2>
+                <p class="cursive text-3xl text-pink-600">Shared Dreams</p>
+                <p class="serif italic text-lg px-6 text-gray-600 mt-2">Looking at the world, but only seeing you.</p>
+            </div>
+        </section>
+
+        <!-- PAGE 5 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/5.jpg" alt="5">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Chapter Four</h2>
+                <p class="serif italic text-xl px-6 text-gray-600 leading-relaxed">
+                    "Like a melody that stays in my heart, you are the song I'll always sing."
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 6 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/6.jpg" alt="6">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Chapter Five</h2>
+                <p class="cursive text-4xl text-pink-600">Pure Magic</p>
+                <p class="serif text-sm mt-4 px-8 text-gray-500">Captured moments that feel like a lifetime of joy.</p>
+            </div>
+        </section>
+
+        <!-- PAGE 7 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/7.jpg" alt="7">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Chapter Six</h2>
+                <p class="serif italic text-xl px-6 text-gray-600 leading-relaxed italic">
+                    "To the world, you may be one person, but to me, you are the world."
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 8 -->
+        <section class="page">
+            <div class="visual-area">
+                <img src="./Photos/8.jpg" alt="8">
+            </div>
+            <div class="journal-strip">
+                <h2 class="serif italic text-pink-400 uppercase tracking-[0.4em] text-xs mb-4">Epilogue</h2>
+                <p class="cursive text-4xl text-pink-600 mb-4">Always and Forever.</p>
+                <button onclick="resetStory()" class="text-[10px] tracking-widest uppercase text-pink-300 font-bold hover:text-pink-600">Replay Journey</button>
+            </div>
+        </section>
+
+        <div class="pagination" id="pageDots"></div>
+    </div>
+
+    <script>
+        let currentIdx = 0;
+        const totalPages = 8;
+        let isAudioPlaying = false;
+        const audio = document.getElementById('bgMusic');
+
+        // Init Pagination Dots
+        const dotBox = document.getElementById('pageDots');
+        for(let i=0; i<totalPages; i++) {
+            const dot = document.createElement('div');
+            dot.className = `pg-dot ${i===0 ? 'active' : ''}`;
+            dot.id = `dot-${i}`;
+            dotBox.appendChild(dot);
+        }
+
+        function unlockStory() {
+            const intro = document.getElementById('intro-screen');
+            const book = document.getElementById('bookView');
+            
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.display = 'none';
+                book.style.display = 'block';
+                setTimeout(() => book.style.opacity = '1', 50);
+            }, 1000);
+
+            audio.play().catch(() => {});
+            isAudioPlaying = true;
+            document.getElementById('musicIcon').style.stroke = "#ff4d6d";
+        }
+
+        function updatePages() {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach((p, i) => {
+                p.classList.remove('active', 'prev');
+                if(i === currentIdx) p.classList.add('active');
+                if(i < currentIdx) p.classList.add('prev');
+            });
+
+            document.querySelectorAll('.pg-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentIdx);
+            });
+        }
+
+        function next() { if(currentIdx < totalPages - 1) { currentIdx++; updatePages(); } }
+        function prev() { if(currentIdx > 0) { currentIdx--; updatePages(); } }
+
+        // SWIPE LOGIC
+        let startX = 0;
+        let startY = 0;
+        document.body.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        document.body.addEventListener('touchend', e => {
+            const diffX = startX - e.changedTouches[0].clientX;
+            const diffY = startY - e.changedTouches[0].clientY;
+            // Ensure it's a horizontal swipe, not vertical
+            if(Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                diffX > 0 ? next() : prev();
+            }
+        });
+
+        function toggleAudio() {
+            if(isAudioPlaying) { audio.pause(); document.getElementById('musicIcon').style.stroke = "#ccc"; }
+            else { audio.play(); document.getElementById('musicIcon').style.stroke = "#ff4d6d"; }
+            isAudioPlaying = !isAudioPlaying;
+        }
+
+        function resetStory() { currentIdx = 0; updatePages(); }
+
+        function createHeart() {
+            const h = document.createElement('div');
+            h.innerHTML = '❤';
+            h.className = 'heart-bit';
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            h.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            document.getElementById('heart-box').appendChild(h);
+            setTimeout(() => h.remove(), 10000);
+        }
+        setInterval(createHeart, 1000);
+
+        window.addEventListener('resize', () => {
+            document.body.style.height = window.innerHeight + 'px';
+        });
+    </script>
+</body>
+</html>
